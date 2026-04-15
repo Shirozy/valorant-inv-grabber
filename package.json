@@ -1,0 +1,49 @@
+{
+  "name": "valorant-inv-grabber",
+  "version": "1.2.1",
+  "private": true,
+  "description": "Local VALORANT skin inventory viewer",
+  "main": "electron/main.js",
+  "scripts": {
+    "start": "node main.js",
+    "desktop": "electron .",
+    "build:win": "electron-builder --win portable"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "build": {
+    "appId": "com.codex.valorantinvgrabber",
+    "productName": "VALORANT Inventory Grabber",
+    "asar": true,
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "electron/**/*",
+      "main.js",
+      "public/**/*",
+      "src/**/*",
+      "package.json"
+    ],
+    "win": {
+      "signAndEditExecutable": false,
+      "target": [
+        {
+          "target": "portable",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "artifactName": "${productName}-${version}.${ext}"
+    }
+  },
+  "dependencies": {
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "electron": "^38.3.0",
+    "electron-builder": "^26.0.12"
+  }
+}

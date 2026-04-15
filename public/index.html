@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VALORANT Skins</title>
+  <link rel="stylesheet" href="/styles.css" />
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <div id="star-container" aria-hidden="true"></div>
+  <div class="wrap">
+    <h1>VALORANT Skin List</h1>
+    <p>Reads your local Riot Client session, pulls your owned weapon skins, and groups them by weapon.</p>
+
+    <div class="toolbar">
+      <button id="refreshBtn" class="btn-6"><span>Refresh skins</span></button>
+      <button id="downloadBtn" class="toolbar-button" type="button">Download Excel</button>
+      <input id="searchInput" type="text" placeholder="Filter skins or weapons..." />
+      <label class="filter-field">
+        <span>Filter</span>
+        <select id="collectionFilterInput">
+          <option value="all">All skins</option>
+          <option value="limited">Limited skins</option>
+          <option value="battlepass">Battlepass only</option>
+          <option value="non-battlepass">Hide battlepass</option>
+        </select>
+      </label>
+    </div>
+
+    <div class="meta" id="meta"></div>
+    <div id="message"></div>
+    <div id="app"></div>
+  </div>
+</body>
+</html>
