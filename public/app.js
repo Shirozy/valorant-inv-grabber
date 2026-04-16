@@ -4,7 +4,11 @@ const meta = document.getElementById('meta');
 const refreshButton = document.getElementById('refreshBtn');
 const downloadButton = document.getElementById('downloadBtn');
 const searchInput = document.getElementById('searchInput');
-const collectionFilterInput = document.getElementById('collectionFilterInput');
+const filterDropdown = document.getElementById('filterDropdown');
+const filterDropdownButton = document.getElementById('filterDropdownButton');
+const filterDropdownMenu = document.getElementById('filterDropdownMenu');
+const filterDropdownSummary = document.getElementById('filterDropdownSummary');
+const filterToggleInputs = [...document.querySelectorAll('.filter-toggle-input')];
 const starContainer = document.getElementById('star-container');
 
 let latestData = null;
@@ -15,6 +19,15 @@ const CONTENT_TIER_TO_RARITY = {
   '60bca009-4182-7998-dee7-b8a2558dc369': 'premium',
   'e046854e-406c-37f4-6607-19a9ba8426fc': 'exclusive',
   '411e4a55-4e59-7757-41f0-86a53f101bb5': 'ultra',
+};
+const FILTER_ALL = 'all';
+const FILTER_SPECIFIC = ['battlepass', 'normal', 'limited', 'contract'];
+const FILTER_LABELS = {
+  all: 'All Skins',
+  battlepass: 'Battlepass',
+  normal: 'Normal',
+  limited: 'Limited',
+  contract: 'Contract',
 };
 
 function escapeHtml(value) {
@@ -66,6 +79,193 @@ function getPriceDisplay(skin) {
 
 function getRarityKey(skin) {
   return CONTENT_TIER_TO_RARITY[skin.contentTierUuid] || 'unknown';
+}
+
+function getActiveFilters() {
+  const activeFilters = filterToggleInputs.filter((input) => input.checked).map((input) => input.value);
+  return activeFilters.length ? activeFilters : [FILTER_ALL];
+}
+
+function setActiveFilters(values) {
+  const activeValues = new Set(values);
+
+  filterToggleInputs.forEach((input) => {
+    input.checked = activeValues.has(input.value);
+  });
+}
+
+function getSkinCategoryCounts(data) {
+  const counts = {
+    all: data.totalSkins ?? 0,
+    battlepass: data.battlepass?.totalSkins ?? 0,
+    contract: data.contract?.totalSkins ?? 0,
+    limited: data.limited?.totalSkins ?? 0,
+    normal: data.normal?.totalSkins ?? 0,
+  };
+
+  return counts;
+}
+
+function updateFilterSummary() {
+  const activeFilters = getActiveFilters();
+
+  if (activeFilters.includes(FILTER_ALL)) {
+    filterDropdownSummary.textContent = FILTER_LABELS.all;
+    return;
+  }
+
+  filterDropdownSummary.textContent = activeFilters.map((value) => FILTER_LABELS[value]).join(', ');
+}
+
+function syncFilterAvailability(data) {
+  const counts = getSkinCategoryCounts(data);
+
+  filterToggleInputs.forEach((input) => {
+    const label = document.querySelector(`label[for="${input.id}"] .filter-option-text`);
+    const baseText = label?.dataset.baseText || label?.textContent || '';
+
+    if (label && !label.dataset.baseText) {
+      label.dataset.baseText = baseText;
+    }
+
+    if (label) {
+      label.textContent = `${label.dataset.baseText} (${counts[input.value] ?? 0})`;
+    }
+
+    if (input.value !== FILTER_ALL) {
+      input.disabled = (counts[input.value] ?? 0) === 0;
+    }
+  });
+
+  const activeSpecificFilters = getActiveFilters().filter((value) => value !== FILTER_ALL);
+  const availableSpecificFilters = FILTER_SPECIFIC.filter((value) => counts[value] > 0);
+
+  if (!availableSpecificFilters.length) {
+    setActiveFilters([FILTER_ALL]);
+    return;
+  }
+
+  if (!activeSpecificFilters.length && !document.getElementById('filter-all').checked) {
+    setActiveFilters([FILTER_ALL]);
+    return;
+  }
+
+  const hasUnavailableActiveFilter = activeSpecificFilters.some((value) => counts[value] === 0);
+  if (hasUnavailableActiveFilter) {
+    const remainingFilters = activeSpecificFilters.filter((value) => counts[value] > 0);
+    setActiveFilters(remainingFilters.length ? remainingFilters : [FILTER_ALL]);
+  }
+
+  updateFilterSummary();
+}
+
+function handleFilterToggleChange(changedInput) {
+  const changedValue = changedInput.value;
+
+  if (changedValue === FILTER_ALL) {
+    if (changedInput.checked) {
+      setActiveFilters([FILTER_ALL]);
+      updateFilterSummary();
+      return;
+    }
+
+    changedInput.checked = true;
+    updateFilterSummary();
+    return;
+  }
+
+  const allInput = document.getElementById('filter-all');
+  const activeSpecificFilters = FILTER_SPECIFIC.filter((value) => {
+    const input = document.getElementById(`filter-${value}`);
+    return input?.checked;
+  });
+
+  if (changedInput.checked) {
+    allInput.checked = false;
+  }
+
+  if (!activeSpecificFilters.length) {
+    setActiveFilters([FILTER_ALL]);
+    updateFilterSummary();
+    return;
+  }
+
+  setActiveFilters(activeSpecificFilters);
+  updateFilterSummary();
+}
+
+function matchesSelectedFilters(skin, activeFilters) {
+  if (activeFilters.includes(FILTER_ALL)) {
+    return true;
+  }
+
+  return activeFilters.some((filter) => {
+    if (filter === 'battlepass') {
+      return skin.isBattlepass;
+    }
+
+    if (filter === 'limited') {
+      return skin.isLimited;
+    }
+
+    if (filter === 'contract') {
+      return skin.isContract;
+    }
+
+    if (filter === 'normal') {
+      return !skin.isBattlepass && !skin.isLimited && !skin.isContract;
+    }
+
+    return false;
+  });
+}
+
+function getEmptyStateText(activeFilters) {
+  if (activeFilters.includes(FILTER_ALL)) {
+    return 'No skins matched your filter.';
+  }
+
+  const filterLabels = {
+    battlepass: 'battlepass',
+    contract: 'contract',
+    limited: 'limited',
+    normal: 'normal',
+  };
+  const selectedLabels = activeFilters.map((value) => filterLabels[value]).filter(Boolean);
+
+  if (selectedLabels.length === 1) {
+    return `No ${selectedLabels[0]} skins matched your filter.`;
+  }
+
+  return 'No skins matched your selected filters.';
+}
+
+function setDropdownOpen(isOpen) {
+  filterDropdownButton.setAttribute('aria-expanded', String(isOpen));
+  filterDropdownMenu.hidden = !isOpen;
+  filterDropdown.classList.toggle('is-open', isOpen);
+}
+
+function initializeFilterDropdown() {
+  updateFilterSummary();
+
+  filterDropdownButton.addEventListener('click', () => {
+    const isOpen = filterDropdownButton.getAttribute('aria-expanded') === 'true';
+    setDropdownOpen(!isOpen);
+  });
+
+  document.addEventListener('click', (event) => {
+    if (!filterDropdown.contains(event.target)) {
+      setDropdownOpen(false);
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape') {
+      setDropdownOpen(false);
+      filterDropdownButton.focus();
+    }
+  });
 }
 
 function initializeCardSpotlight() {
@@ -160,26 +360,11 @@ function initializeStarField() {
   window.requestAnimationFrame(renderStars);
 }
 
-function syncFilterAvailability(data) {
-  const battlepassAvailable = Boolean(data.battlepass?.available);
-  const battlepassOption = collectionFilterInput.querySelector('option[value="battlepass"]');
-  const nonBattlepassOption = collectionFilterInput.querySelector(
-    'option[value="non-battlepass"]'
-  );
-
-  battlepassOption.disabled = !battlepassAvailable;
-  nonBattlepassOption.disabled = !battlepassAvailable;
-
-  if (!battlepassAvailable && ['battlepass', 'non-battlepass'].includes(collectionFilterInput.value)) {
-    collectionFilterInput.value = 'all';
-  }
-}
-
 function render(data) {
   latestData = data;
   const filter = searchInput.value.trim().toLowerCase();
   syncFilterAvailability(data);
-  const filterMode = collectionFilterInput.value;
+  const activeFilters = getActiveFilters();
 
   meta.innerHTML = [
     `<div><strong>Player:</strong> ${escapeHtml(`${data.player.gameName}#${data.player.tagLine}`)}</div>`,
@@ -188,21 +373,14 @@ function render(data) {
     `<div><strong>Total skins:</strong> ${escapeHtml(data.totalSkins)}</div>`,
     `<div><strong>Battlepass skins:</strong> ${escapeHtml(data.battlepass?.totalSkins ?? 0)}</div>`,
     `<div><strong>Limited skins:</strong> ${escapeHtml(data.limited?.totalSkins ?? 0)}</div>`,
+    `<div><strong>Contract skins:</strong> ${escapeHtml(data.contract?.totalSkins ?? 0)}</div>`,
   ].join('');
 
   const groups = data.groups
     .map((group) => ({
       ...group,
       skins: group.skins.filter((skin) => {
-        if (filterMode === 'limited' && !skin.isLimited) {
-          return false;
-        }
-
-        if (filterMode === 'battlepass' && !skin.isBattlepass) {
-          return false;
-        }
-
-        if (filterMode === 'non-battlepass' && skin.isBattlepass) {
+        if (!matchesSelectedFilters(skin, activeFilters)) {
           return false;
         }
 
@@ -219,14 +397,7 @@ function render(data) {
     .filter((group) => group.skins.length > 0);
 
   if (!groups.length) {
-    const emptyTextByMode = {
-      all: 'No skins matched your filter.',
-      limited: 'No limited skins matched your filter.',
-      battlepass: 'No battlepass skins matched your filter.',
-      'non-battlepass': 'No non-battlepass skins matched your filter.',
-    };
-    const emptyText = emptyTextByMode[filterMode] || emptyTextByMode.all;
-    app.innerHTML = `<div class="empty">${emptyText}</div>`;
+    app.innerHTML = `<div class="empty">${getEmptyStateText(activeFilters)}</div>`;
     return;
   }
 
@@ -328,12 +499,17 @@ searchInput.addEventListener('input', () => {
     render(latestData);
   }
 });
-collectionFilterInput.addEventListener('input', () => {
-  if (latestData) {
-    render(latestData);
-  }
+filterToggleInputs.forEach((input) => {
+  input.addEventListener('change', () => {
+    handleFilterToggleChange(input);
+
+    if (latestData) {
+      render(latestData);
+    }
+  });
 });
 
 initializeStarField();
 initializeCardSpotlight();
+initializeFilterDropdown();
 loadSkins();

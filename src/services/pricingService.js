@@ -66,6 +66,7 @@ function buildFallbackPricing(skin) {
   if (skin.isBattlepass) {
     return {
       acquisitionLabel: 'Battlepass reward',
+      acquisitionType: 'battlepass',
       isPriceEstimated: false,
       priceLabel: 'Battlepass',
       priceVp: null,
@@ -76,6 +77,7 @@ function buildFallbackPricing(skin) {
   if (fixedPrice) {
     return {
       acquisitionLabel: skin.isLimited ? 'Limited store skin' : 'Store skin',
+      acquisitionType: skin.isLimited ? 'limited' : 'store',
       isPriceEstimated: true,
       priceLabel: formatVp(fixedPrice),
       priceVp: fixedPrice,
@@ -91,6 +93,7 @@ function buildFallbackPricing(skin) {
 
     return {
       acquisitionLabel: skin.isLimited ? 'Limited store skin' : 'Store skin',
+      acquisitionType: skin.isLimited ? 'limited' : 'store',
       isPriceEstimated: true,
       priceLabel: estimatedPrice ? formatVp(estimatedPrice) : variableTierLabel,
       priceVp: estimatedPrice,
@@ -99,6 +102,7 @@ function buildFallbackPricing(skin) {
 
   return {
     acquisitionLabel: skin.isLimited ? 'Limited-time skin' : 'Price unavailable',
+    acquisitionType: skin.isLimited ? 'limited' : 'unknown',
     isPriceEstimated: false,
     priceLabel: skin.isLimited ? 'Limited' : 'Unknown',
     priceVp: null,
@@ -135,6 +139,7 @@ function parsePricingFromDescription(description, skin) {
   if (skin.isBattlepass) {
     return {
       acquisitionLabel: 'Battlepass reward',
+      acquisitionType: 'battlepass',
       isPriceEstimated: false,
       priceLabel: 'Battlepass',
       priceVp: null,
@@ -144,6 +149,7 @@ function parsePricingFromDescription(description, skin) {
   if (contractMatch) {
     return {
       acquisitionLabel: contractMatch[1].trim(),
+      acquisitionType: 'contract',
       isPriceEstimated: false,
       priceLabel: 'Free',
       priceVp: null,
@@ -154,6 +160,7 @@ function parsePricingFromDescription(description, skin) {
     const priceVp = Number(priceMatch[1]);
     return {
       acquisitionLabel: skin.isLimited ? 'Limited store skin' : 'Store skin',
+      acquisitionType: skin.isLimited ? 'limited' : 'store',
       isPriceEstimated: false,
       priceLabel: formatVp(priceVp),
       priceVp,
@@ -169,6 +176,7 @@ function parsePricingFromDescription(description, skin) {
   if (cannotBePurchased) {
     return {
       acquisitionLabel: 'Free unlock',
+      acquisitionType: 'free',
       isPriceEstimated: false,
       priceLabel: 'Free',
       priceVp: null,
@@ -342,6 +350,7 @@ async function enrichSkinsWithPricing(skins) {
       ? {
           ...skin,
           ...pricingMap.get(getSkinCacheKey(skin)),
+          isContract: pricingMap.get(getSkinCacheKey(skin))?.acquisitionType === 'contract',
         }
       : null
   );

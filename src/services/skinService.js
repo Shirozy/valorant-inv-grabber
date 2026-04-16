@@ -27,6 +27,18 @@ async function buildSkinResponse() {
     (sum, group) => sum + group.skins.filter((skin) => skin.isLimited).length,
     0
   );
+  const totalContractSkins = groups.reduce(
+    (sum, group) => sum + group.skins.filter((skin) => skin.isContract).length,
+    0
+  );
+  const totalNormalSkins = groups.reduce(
+    (sum, group) =>
+      sum +
+      group.skins.filter(
+        (skin) => !skin.isBattlepass && !skin.isLimited && !skin.isContract
+      ).length,
+    0
+  );
 
   return {
     battlepass: {
@@ -34,10 +46,18 @@ async function buildSkinResponse() {
       partial: battlepassCatalog.partial,
       totalSkins: totalBattlepassSkins,
     },
+    contract: {
+      available: true,
+      totalSkins: totalContractSkins,
+    },
     groups,
     limited: {
       available: true,
       totalSkins: totalLimitedSkins,
+    },
+    normal: {
+      available: true,
+      totalSkins: totalNormalSkins,
     },
     player: {
       gameName: session.gameName,

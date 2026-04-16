@@ -17,15 +17,53 @@
       <button id="refreshBtn" class="btn-6"><span>Refresh skins</span></button>
       <button id="downloadBtn" class="toolbar-button" type="button">Download Excel</button>
       <input id="searchInput" type="text" placeholder="Filter skins or weapons..." />
-      <label class="filter-field">
-        <span>Filter</span>
-        <select id="collectionFilterInput">
-          <option value="all">All skins</option>
-          <option value="limited">Limited skins</option>
-          <option value="battlepass">Battlepass only</option>
-          <option value="non-battlepass">Hide battlepass</option>
-        </select>
-      </label>
+      <div class="filter-dropdown" id="filterDropdown">
+        <button
+          id="filterDropdownButton"
+          class="filter-dropdown-button"
+          type="button"
+          aria-haspopup="true"
+          aria-expanded="false"
+        >
+          <span class="filter-dropdown-label">Filters</span>
+          <span class="filter-dropdown-summary" id="filterDropdownSummary">All Skins</span>
+          <span class="filter-dropdown-caret" aria-hidden="true"></span>
+        </button>
+
+        <div class="filter-dropdown-menu" id="filterDropdownMenu" hidden>
+          <div class="filter-option-list">
+            <label class="filter-option" for="filter-all">
+              <input class="filter-toggle-input" type="checkbox" id="filter-all" value="all" checked />
+              <span class="filter-option-box"></span>
+              <span class="filter-option-text">All Skins</span>
+            </label>
+
+            <label class="filter-option" for="filter-battlepass">
+              <input class="filter-toggle-input" type="checkbox" id="filter-battlepass" value="battlepass" />
+              <span class="filter-option-box"></span>
+              <span class="filter-option-text">Battlepass</span>
+            </label>
+
+            <label class="filter-option" for="filter-normal">
+              <input class="filter-toggle-input" type="checkbox" id="filter-normal" value="normal" />
+              <span class="filter-option-box"></span>
+              <span class="filter-option-text">Normal</span>
+            </label>
+
+            <label class="filter-option" for="filter-limited">
+              <input class="filter-toggle-input" type="checkbox" id="filter-limited" value="limited" />
+              <span class="filter-option-box"></span>
+              <span class="filter-option-text">Limited</span>
+            </label>
+
+            <label class="filter-option" for="filter-contract">
+              <input class="filter-toggle-input" type="checkbox" id="filter-contract" value="contract" />
+              <span class="filter-option-box"></span>
+              <span class="filter-option-text">Contract</span>
+            </label>
+          </div>
+        </div>
+      </div>
     </div>
 
     <div class="meta" id="meta"></div>
