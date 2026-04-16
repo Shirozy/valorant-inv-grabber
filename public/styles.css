@@ -547,6 +547,96 @@ button:hover {
   padding: 24px 0;
 }
 
+.value-summary {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    linear-gradient(180deg, rgba(14, 18, 27, 0.8), rgba(9, 12, 19, 0.7)),
+    rgba(255, 255, 255, 0.03);
+  border-radius: 22px;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.05),
+    0 24px 60px rgba(0, 0, 0, 0.32);
+  margin-top: 28px;
+  padding: 22px;
+  position: relative;
+  overflow: hidden;
+}
+
+.value-summary::before {
+  content: '';
+  inset: 0;
+  position: absolute;
+  background:
+    radial-gradient(circle at top right, rgba(124, 58, 237, 0.12), transparent 32%),
+    radial-gradient(circle at bottom left, rgba(6, 182, 212, 0.1), transparent 34%);
+  pointer-events: none;
+}
+
+.value-summary-header,
+.value-summary-grid {
+  position: relative;
+  z-index: 1;
+}
+
+.value-summary-header {
+  align-items: end;
+  display: flex;
+  gap: 18px;
+  justify-content: space-between;
+  margin-bottom: 18px;
+}
+
+.value-summary-header h2 {
+  font-size: 1.15rem;
+  margin: 0 0 6px;
+}
+
+.value-summary-header p {
+  margin: 0;
+  max-width: 48ch;
+}
+
+.value-summary-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+}
+
+.value-card {
+  background:
+    linear-gradient(180deg, rgba(20, 26, 37, 0.82), rgba(13, 17, 24, 0.75)),
+    rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-height: 126px;
+  padding: 16px;
+}
+
+.value-card-label {
+  color: var(--muted);
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+.value-card-value {
+  color: var(--text);
+  font-size: clamp(1.15rem, 3vw, 1.6rem);
+  line-height: 1.15;
+}
+
+.value-card-detail {
+  color: rgba(232, 237, 242, 0.62);
+  font-size: 0.84rem;
+  line-height: 1.45;
+  margin-top: auto;
+}
+
 .filter-toggle-input {
   position: absolute;
   opacity: 0;
@@ -751,6 +841,11 @@ button:hover {
   .filter-dropdown-button {
     min-width: 0;
     width: 100%;
+  }
+
+  .value-summary-header {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .card {

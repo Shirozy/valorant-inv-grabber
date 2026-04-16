@@ -10,6 +10,8 @@ const filterDropdownMenu = document.getElementById('filterDropdownMenu');
 const filterDropdownSummary = document.getElementById('filterDropdownSummary');
 const filterToggleInputs = [...document.querySelectorAll('.filter-toggle-input')];
 const starContainer = document.getElementById('star-container');
+const valueSummary = document.getElementById('valueSummary');
+const valueSummaryGrid = document.getElementById('valueSummaryGrid');
 
 let latestData = null;
 
@@ -22,6 +24,7 @@ const CONTENT_TIER_TO_RARITY = {
 };
 const FILTER_ALL = 'all';
 const FILTER_SPECIFIC = ['battlepass', 'normal', 'limited', 'contract'];
+const VP_PER_EUR = 100;
 const FILTER_LABELS = {
   all: 'All Skins',
   battlepass: 'Battlepass',
@@ -79,6 +82,104 @@ function getPriceDisplay(skin) {
 
 function getRarityKey(skin) {
   return CONTENT_TIER_TO_RARITY[skin.contentTierUuid] || 'unknown';
+}
+
+function formatNumber(value) {
+  return value.toLocaleString('en-US');
+}
+
+function formatMoney(value, currency) {
+  return new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency,
+    maximumFractionDigits: 2,
+  }).format(value);
+}
+
+function getVisibleSkins(groups) {
+  return groups.flatMap((group) => group.skins);
+}
+
+function buildValueSummaryData(groups) {
+  const skins = getVisibleSkins(groups);
+  const exactVp = skins.reduce(
+    (sum, skin) => (typeof skin.priceVp === 'number' && !skin.isPriceEstimated ? sum + skin.priceVp : sum),
+    0
+  );
+  const estimatedVp = skins.reduce(
+    (sum, skin) => (typeof skin.priceVp === 'number' && skin.isPriceEstimated ? sum + skin.priceVp : sum),
+    0
+  );
+  const combinedVp = exactVp + estimatedVp;
+  const exactEur = exactVp / VP_PER_EUR;
+  const estimatedEur = estimatedVp / VP_PER_EUR;
+  const combinedEur = combinedVp / VP_PER_EUR;
+
+  return {
+    exactEur,
+    exactVp,
+    estimatedEur,
+    estimatedVp,
+    combinedEur,
+    combinedVp,
+    visibleSkinCount: skins.length,
+  };
+}
+
+function renderValueSummary(groups) {
+  if (!valueSummary || !valueSummaryGrid) {
+    return;
+  }
+
+  const summary = buildValueSummaryData(groups);
+
+  valueSummaryGrid.innerHTML = [
+    {
+      title: 'Visible Skins',
+      value: formatNumber(summary.visibleSkinCount),
+      detail: 'Current search and filters',
+    },
+    {
+      title: 'Exact VP',
+      value: `${formatNumber(summary.exactVp)} VP`,
+      detail: 'Confirmed exact prices',
+    },
+    {
+      title: 'Estimated VP',
+      value: `${formatNumber(summary.estimatedVp)} VP`,
+      detail: 'Tier-based approximations',
+    },
+    {
+      title: 'Total VP',
+      value: `${formatNumber(summary.combinedVp)} VP`,
+      detail: 'Exact + estimated combined',
+    },
+    {
+      title: 'Exact EUR',
+      value: formatMoney(summary.exactEur, 'EUR'),
+      detail: 'Using 1000 VP = EUR 10',
+    },
+    {
+      title: 'Estimated EUR',
+      value: formatMoney(summary.estimatedEur, 'EUR'),
+      detail: 'Approximate euro value',
+    },
+    {
+      title: 'Total EUR',
+      value: formatMoney(summary.combinedEur, 'EUR'),
+      detail: 'Exact + estimated combined',
+    },
+  ]
+    .map(
+      (item) => `
+        <article class="value-card">
+          <span class="value-card-label">${escapeHtml(item.title)}</span>
+          <strong class="value-card-value">${escapeHtml(item.value)}</strong>
+          <span class="value-card-detail">${escapeHtml(item.detail)}</span>
+        </article>
+      `
+    )
+    .join('');
 }
 
 function getActiveFilters() {
@@ -395,6 +496,8 @@ function render(data) {
       }),
     }))
     .filter((group) => group.skins.length > 0);
+
+  renderValueSummary(groups);
 
   if (!groups.length) {
     app.innerHTML = `<div class="empty">${getEmptyStateText(activeFilters)}</div>`;
