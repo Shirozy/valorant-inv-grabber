@@ -12,8 +12,17 @@ const filterToggleInputs = [...document.querySelectorAll('.filter-toggle-input')
 const starContainer = document.getElementById('star-container');
 const valueSummary = document.getElementById('valueSummary');
 const valueSummaryGrid = document.getElementById('valueSummaryGrid');
+const skinModal = document.getElementById('skinModal');
+const skinModalBackdrop = document.getElementById('skinModalBackdrop');
+const skinModalBody = document.getElementById('skinModalBody');
+const skinModalClose = document.getElementById('skinModalClose');
 
 let latestData = null;
+let activeModalSkin = null;
+let activeModalState = {
+  selectedChromaIndex: null,
+  selectedLevelIndex: null,
+};
 
 const CONTENT_TIER_TO_RARITY = {
   '12683d76-48d7-84a3-4e09-6985794f0445': 'select',
@@ -31,6 +40,13 @@ const FILTER_LABELS = {
   normal: 'Normal',
   limited: 'Limited',
   contract: 'Contract',
+};
+const CONTENT_TIER_LABELS = {
+  '12683d76-48d7-84a3-4e09-6985794f0445': 'Select',
+  '0cebb8be-46d7-c12a-d306-e9907bfc5a25': 'Deluxe',
+  '60bca009-4182-7998-dee7-b8a2558dc369': 'Premium',
+  'e046854e-406c-37f4-6607-19a9ba8426fc': 'Exclusive',
+  '411e4a55-4e59-7757-41f0-86a53f101bb5': 'Ultra',
 };
 
 function escapeHtml(value) {
@@ -82,6 +98,262 @@ function getPriceDisplay(skin) {
 
 function getRarityKey(skin) {
   return CONTENT_TIER_TO_RARITY[skin.contentTierUuid] || 'unknown';
+}
+
+function getContentTierLabel(contentTierUuid) {
+  return CONTENT_TIER_LABELS[contentTierUuid] || 'Unknown';
+}
+
+function getSkinCategoryLabel(skin) {
+  if (skin.isBattlepass) {
+    return 'Battlepass';
+  }
+
+  if (skin.isContract) {
+    return 'Contract';
+  }
+
+  if (skin.isLimited) {
+    return 'Limited';
+  }
+
+  return 'Normal';
+}
+
+function getSelectedChroma(skin, state = activeModalState) {
+  const chromas = skin.chromas || [];
+
+  if (
+    Number.isInteger(state.selectedChromaIndex)
+    && state.selectedChromaIndex >= 0
+    && state.selectedChromaIndex < chromas.length
+  ) {
+    return chromas[state.selectedChromaIndex];
+  }
+
+  return null;
+}
+
+function getSelectedLevel(skin, state = activeModalState) {
+  const levels = skin.levels || [];
+
+  if (
+    Number.isInteger(state.selectedLevelIndex)
+    && state.selectedLevelIndex >= 0
+    && state.selectedLevelIndex < levels.length
+  ) {
+    return levels[state.selectedLevelIndex];
+  }
+
+  return null;
+}
+
+function getPreviewVideo(skin, state = activeModalState) {
+  const selectedLevel = getSelectedLevel(skin, state);
+  const selectedChroma = getSelectedChroma(skin, state);
+
+  return (
+    selectedLevel?.streamedVideo
+    || selectedChroma?.streamedVideo
+    || skin.levels?.find((level) => level.streamedVideo)?.streamedVideo
+    || skin.chromas?.find((chroma) => chroma.streamedVideo)?.streamedVideo
+    || ''
+  );
+}
+
+function getPreviewImage(skin, state = activeModalState) {
+  const selectedLevel = getSelectedLevel(skin, state);
+  const selectedChroma = getSelectedChroma(skin, state);
+
+  return (
+    selectedChroma?.fullRender
+    || selectedChroma?.displayIcon
+    || selectedLevel?.displayIcon
+    || skin.wallpaper
+    || skin.chromas?.find((chroma) => chroma.fullRender)?.fullRender
+    || skin.image
+    || ''
+  );
+}
+
+function renderSkinTag(label, value) {
+  return `
+    <div class="skin-detail-meta-item">
+      <span class="skin-detail-meta-label">${escapeHtml(label)}</span>
+      <strong class="skin-detail-meta-value">${escapeHtml(value)}</strong>
+    </div>
+  `;
+}
+
+function renderSkinDetailModal(skin, state = activeModalState) {
+  const previewVideo = getPreviewVideo(skin, state);
+  const previewImage = getPreviewImage(skin, state);
+  const chromaItems = (skin.chromas || []).slice(0, 8);
+  const levelItems = (skin.levels || []).slice(0, 8);
+  const selectedChroma = getSelectedChroma(skin, state);
+  const selectedLevel = getSelectedLevel(skin, state);
+  const flags = [
+    skin.isBattlepass ? 'Battlepass' : null,
+    skin.isLimited ? 'Limited' : null,
+    skin.isContract ? 'Contract' : null,
+    skin.isPriceEstimated ? 'Estimated value' : null,
+  ].filter(Boolean);
+
+  skinModalBody.innerHTML = `
+    <div class="skin-detail-hero" data-rarity="${escapeHtml(getRarityKey(skin))}">
+      <div class="skin-detail-preview">
+        ${
+          previewVideo
+            ? `<video class="skin-detail-video" src="${escapeHtml(previewVideo)}" autoplay muted loop playsinline controls></video>`
+            : previewImage
+              ? `<img class="skin-detail-image" src="${escapeHtml(previewImage)}" alt="${escapeHtml(skin.displayName)}" />`
+              : '<div class="skin-detail-empty">No preview available</div>'
+        }
+        <div class="skin-detail-preview-status">
+          <span>${escapeHtml(selectedChroma?.displayName || 'Default chroma')}</span>
+          <span>${escapeHtml(selectedLevel?.displayName || 'Default level preview')}</span>
+        </div>
+      </div>
+      <div class="skin-detail-copy">
+        <div class="skin-detail-chip-row">
+          <span class="card-chip">${escapeHtml(skin.weapon)}</span>
+          <span class="card-chip card-chip-accent">${escapeHtml(getPriceDisplay(skin))}</span>
+          <span class="card-chip">${escapeHtml(getContentTierLabel(skin.contentTierUuid))}</span>
+        </div>
+        <h2 id="skinModalTitle">${escapeHtml(skin.displayName)}</h2>
+        <p class="skin-detail-subtitle">${escapeHtml(skin.acquisitionLabel || 'Price unavailable')}</p>
+        ${
+          flags.length
+            ? `<div class="skin-detail-flag-row">${flags
+                .map((flag) => `<span class="skin-detail-flag">${escapeHtml(flag)}</span>`)
+                .join('')}</div>`
+            : ''
+        }
+        <div class="skin-detail-actions">
+          <button class="skin-detail-action" type="button" data-reset-preview="true">Reset preview</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="skin-detail-grid">
+      <section class="skin-detail-section">
+        <h3>Skin Info</h3>
+        <div class="skin-detail-meta-grid">
+          ${renderSkinTag('Category', getSkinCategoryLabel(skin))}
+          ${renderSkinTag('Tier', getContentTierLabel(skin.contentTierUuid))}
+          ${renderSkinTag('Weapon', skin.weapon)}
+          ${renderSkinTag('Price Type', skin.isPriceEstimated ? 'Estimated' : typeof skin.priceVp === 'number' ? 'Exact' : skin.priceLabel || 'Unknown')}
+          ${renderSkinTag('VP Value', typeof skin.priceVp === 'number' ? `${formatNumber(skin.priceVp)} VP` : skin.priceLabel || 'Unknown')}
+          ${renderSkinTag('EUR Value', typeof skin.priceVp === 'number' ? formatMoney(skin.priceVp / VP_PER_EUR, 'EUR') : 'N/A')}
+          ${renderSkinTag('Chromas', formatNumber(skin.chromas?.length || 0))}
+          ${renderSkinTag('Levels', formatNumber(skin.levels?.length || 0))}
+        </div>
+      </section>
+
+      <section class="skin-detail-section">
+        <h3>Identifiers</h3>
+        <div class="skin-detail-code-list">
+          <div>
+            <span>Skin UUID</span>
+            <code>${escapeHtml(skin.uuid || 'Unknown')}</code>
+          </div>
+          <div>
+            <span>Theme UUID</span>
+            <code>${escapeHtml(skin.theme || 'Unknown')}</code>
+          </div>
+          <div>
+            <span>Asset Path</span>
+            <code>${escapeHtml(skin.assetPath || 'Unknown')}</code>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    ${
+      chromaItems.length
+        ? `
+          <section class="skin-detail-section">
+            <h3>Chromas</h3>
+            <div class="skin-detail-visual-grid">
+              ${chromaItems
+                .map(
+                  (chroma, index) => `
+                    <button
+                      class="skin-detail-visual-card${index === state.selectedChromaIndex ? ' is-active' : ''}"
+                      type="button"
+                      data-chroma-index="${index}"
+                    >
+                      <div class="skin-detail-visual-preview">
+                        ${
+                          chroma.swatch
+                            ? `<img src="${escapeHtml(chroma.swatch)}" alt="${escapeHtml(chroma.displayName)} swatch" />`
+                          : chroma.displayIcon
+                              ? `<img src="${escapeHtml(chroma.displayIcon)}" alt="${escapeHtml(chroma.displayName)} icon" />`
+                              : '<div class="skin-detail-empty">No swatch</div>'
+                        }
+                      </div>
+                      <strong>${escapeHtml(chroma.displayName || skin.displayName)}</strong>
+                    </button>
+                  `
+                )
+                .join('')}
+            </div>
+          </section>
+        `
+        : ''
+    }
+
+    ${
+      levelItems.length
+        ? `
+          <section class="skin-detail-section">
+            <h3>Levels</h3>
+            <div class="skin-detail-level-list">
+              ${levelItems
+                .map(
+                  (level, index) => `
+                    <button
+                      class="skin-detail-level-item${index === state.selectedLevelIndex ? ' is-active' : ''}"
+                      type="button"
+                      data-level-index="${index}"
+                    >
+                      <div>
+                        <strong>Level ${index + 1}</strong>
+                        <p>${escapeHtml(level.displayName || skin.displayName)}</p>
+                      </div>
+                      <span>${escapeHtml(level.levelItem || (level.streamedVideo ? 'Includes preview video' : 'Base level'))}</span>
+                    </button>
+                  `
+                )
+                .join('')}
+            </div>
+          </section>
+        `
+        : ''
+    }
+  `;
+}
+
+function openSkinModal(skin) {
+  activeModalSkin = skin;
+  activeModalState = {
+    selectedChromaIndex: null,
+    selectedLevelIndex: null,
+  };
+  renderSkinDetailModal(skin, activeModalState);
+  skinModal.hidden = false;
+  document.body.classList.add('modal-open');
+}
+
+function closeSkinModal() {
+  skinModal.hidden = true;
+  skinModalBody.innerHTML = '';
+  document.body.classList.remove('modal-open');
+  activeModalSkin = null;
+  activeModalState = {
+    selectedChromaIndex: null,
+    selectedLevelIndex: null,
+  };
 }
 
 function formatNumber(value) {
@@ -387,6 +659,84 @@ function initializeCardSpotlight() {
   });
 }
 
+function initializeSkinModal() {
+  app.addEventListener('click', (event) => {
+    const card = event.target.closest('.card');
+
+    if (!card) {
+      return;
+    }
+
+    const serializedSkin = card.getAttribute('data-skin');
+    if (!serializedSkin) {
+      return;
+    }
+
+    try {
+      openSkinModal(JSON.parse(serializedSkin));
+    } catch {
+      setError('Could not open that skin preview.');
+    }
+  });
+
+  app.addEventListener('keydown', (event) => {
+    const card = event.target.closest('.card');
+
+    if (!card || !['Enter', ' '].includes(event.key)) {
+      return;
+    }
+
+    event.preventDefault();
+    card.click();
+  });
+
+  skinModalBody.addEventListener('click', (event) => {
+    if (!activeModalSkin) {
+      return;
+    }
+
+    const resetButton = event.target.closest('[data-reset-preview]');
+    if (resetButton) {
+      activeModalState = {
+        selectedChromaIndex: null,
+        selectedLevelIndex: null,
+      };
+      renderSkinDetailModal(activeModalSkin, activeModalState);
+      return;
+    }
+
+    const chromaButton = event.target.closest('[data-chroma-index]');
+    if (chromaButton) {
+      const nextIndex = Number(chromaButton.getAttribute('data-chroma-index'));
+      activeModalState = {
+        ...activeModalState,
+        selectedChromaIndex: Number.isFinite(nextIndex) ? nextIndex : null,
+      };
+      renderSkinDetailModal(activeModalSkin, activeModalState);
+      return;
+    }
+
+    const levelButton = event.target.closest('[data-level-index]');
+    if (levelButton) {
+      const nextIndex = Number(levelButton.getAttribute('data-level-index'));
+      activeModalState = {
+        ...activeModalState,
+        selectedLevelIndex: Number.isFinite(nextIndex) ? nextIndex : null,
+      };
+      renderSkinDetailModal(activeModalSkin, activeModalState);
+    }
+  });
+
+  skinModalClose.addEventListener('click', closeSkinModal);
+  skinModalBackdrop.addEventListener('click', closeSkinModal);
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && !skinModal.hidden) {
+      closeSkinModal();
+    }
+  });
+}
+
 function initializeStarField() {
   if (!starContainer) {
     return;
@@ -516,7 +866,14 @@ function render(data) {
             ${group.skins
               .map(
                 (skin) => `
-                  <article class="card" data-rarity="${escapeHtml(getRarityKey(skin))}">
+                  <article
+                    class="card"
+                    data-rarity="${escapeHtml(getRarityKey(skin))}"
+                    data-skin="${escapeHtml(JSON.stringify(skin))}"
+                    tabindex="0"
+                    role="button"
+                    aria-label="Open details for ${escapeHtml(skin.displayName)}"
+                  >
                     <div class="card-content">
                       <div class="card-image">
                         <img src="${escapeHtml(skin.image || '')}" alt="${escapeHtml(skin.displayName)}" loading="lazy" />
@@ -615,4 +972,5 @@ filterToggleInputs.forEach((input) => {
 initializeStarField();
 initializeCardSpotlight();
 initializeFilterDropdown();
+initializeSkinModal();
 loadSkins();

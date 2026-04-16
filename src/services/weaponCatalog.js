@@ -47,9 +47,26 @@ async function getWeaponMetadata() {
       );
 
       const skinDetails = {
+        assetPath: skin.assetPath || '',
+        chromas: (skin.chromas || []).map((chroma) => ({
+          displayIcon: chroma.displayIcon || '',
+          displayName: chroma.displayName || skin.displayName,
+          fullRender: chroma.fullRender || '',
+          streamedVideo: chroma.streamedVideo || '',
+          swatch: chroma.swatch || '',
+          uuid: chroma.uuid,
+        })),
         contentTierUuid: skin.contentTierUuid,
         displayName: skin.displayName,
         image,
+        levels: (skin.levels || []).map((level) => ({
+          displayIcon: level.displayIcon || '',
+          displayName: level.displayName || skin.displayName,
+          levelItem: level.levelItem || '',
+          streamedVideo: level.streamedVideo || '',
+          uuid: level.uuid,
+        })),
+        wallpaper: skin.wallpaper || '',
         theme: skin.themeUuid || 'Theme',
         uuid: skin.uuid,
         weapon: weaponName,
