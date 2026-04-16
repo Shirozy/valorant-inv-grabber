@@ -17,6 +17,22 @@ It reads your local Riot session, fetches your inventory, and presents it in a c
 
 This project is designed to feel a little more fun than a plain utility app, while still staying practical and easy to use.
 
+### Main App
+
+![Main app preview](docs/images/preview.png)
+
+### Filter Dropdown
+
+![Filter dropdown preview](docs/images/filters.png)
+
+### Collection Value Summary
+
+![Collection value preview](docs/images/collection-value.png)
+
+### Excel Export
+
+![Excel export preview](docs/images/google-sheets-spreadsheet.png)
+
 ## Stack
 
 - Node.js
