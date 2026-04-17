@@ -1,6 +1,9 @@
 const app = document.getElementById('app');
 const message = document.getElementById('message');
 const meta = document.getElementById('meta');
+const heroKicker = document.getElementById('heroKicker');
+const heroTitle = document.getElementById('heroTitle');
+const heroSubtitle = document.getElementById('heroSubtitle');
 const refreshButton = document.getElementById('refreshBtn');
 const downloadButton = document.getElementById('downloadBtn');
 const searchInput = document.getElementById('searchInput');
@@ -12,6 +15,7 @@ const filterToggleInputs = [...document.querySelectorAll('.filter-toggle-input')
 const starContainer = document.getElementById('star-container');
 const valueSummary = document.getElementById('valueSummary');
 const valueSummaryGrid = document.getElementById('valueSummaryGrid');
+const themeToggle = document.getElementById('themeToggle');
 const skinModal = document.getElementById('skinModal');
 const skinModalBackdrop = document.getElementById('skinModalBackdrop');
 const skinModalBody = document.getElementById('skinModalBody');
@@ -34,6 +38,7 @@ const CONTENT_TIER_TO_RARITY = {
 const FILTER_ALL = 'all';
 const FILTER_SPECIFIC = ['battlepass', 'normal', 'limited', 'contract'];
 const VP_PER_EUR = 100;
+const THEME_STORAGE_KEY = 'valorant-inv-grabber.theme';
 const FILTER_LABELS = {
   all: 'All Skins',
   battlepass: 'Battlepass',
@@ -48,6 +53,110 @@ const CONTENT_TIER_LABELS = {
   'e046854e-406c-37f4-6607-19a9ba8426fc': 'Exclusive',
   '411e4a55-4e59-7757-41f0-86a53f101bb5': 'Ultra',
 };
+const THEME_COPY = {
+  day: {
+    documentTitle: 'VALORANT Skin Bloom',
+    kicker: 'Collection Showcase',
+    subtitle:
+      'Browse your owned skins with prices, chromas, animated level previews, and account value at a glance.',
+    title: 'VALORANT SKIN BLOOM',
+  },
+  night: {
+    documentTitle: 'VALORANT Skin Vault',
+    kicker: 'Collection Intelligence',
+    subtitle:
+      'Inspect your owned skins, prices, chromas, and level previews in one place.',
+    title: 'VALORANT SKIN VAULT',
+  },
+};
+const THEME_STOP_IDS = {
+  bgStart: 'theme-stop1',
+  bgEnd: 'theme-stop2',
+  circleStart: 'theme-stop1-circle',
+  circleEnd: 'theme-stop2-circle',
+  mountain1Start: 'theme-mountain1-stop1',
+  mountain1End: 'theme-mountain1-stop2',
+  mountain2Start: 'theme-mountain2-stop1',
+  mountain2End: 'theme-mountain2-stop2',
+  mountain3Start: 'theme-mountain3-stop1',
+  mountain3End: 'theme-mountain3-stop2',
+  mountain4Start: 'theme-mountain4-stop1',
+  mountain4End: 'theme-mountain4-stop2',
+};
+
+function setGradientStop(id, color) {
+  const stop = document.getElementById(id);
+  if (stop) {
+    stop.setAttribute('stop-color', color);
+  }
+}
+
+function applyTheme(theme) {
+  const normalizedTheme = theme === 'day' ? 'day' : 'night';
+  document.body.dataset.theme = normalizedTheme;
+  const themeCopy = THEME_COPY[normalizedTheme];
+
+  if (themeToggle) {
+    themeToggle.checked = normalizedTheme === 'day';
+  }
+
+  if (heroKicker) {
+    heroKicker.textContent = themeCopy.kicker;
+  }
+
+  if (heroTitle) {
+    heroTitle.textContent = themeCopy.title;
+  }
+
+  if (heroSubtitle) {
+    heroSubtitle.textContent = themeCopy.subtitle;
+  }
+
+  document.title = themeCopy.documentTitle;
+
+  if (normalizedTheme === 'day') {
+    setGradientStop(THEME_STOP_IDS.bgStart, '#9FDEF2');
+    setGradientStop(THEME_STOP_IDS.bgEnd, '#A8FFAC');
+    setGradientStop(THEME_STOP_IDS.circleStart, '#F6F061');
+    setGradientStop(THEME_STOP_IDS.circleEnd, '#61EDF6');
+    setGradientStop(THEME_STOP_IDS.mountain1Start, '#86D2A0');
+    setGradientStop(THEME_STOP_IDS.mountain1End, '#517D91');
+    setGradientStop(THEME_STOP_IDS.mountain2Start, '#86D2A0');
+    setGradientStop(THEME_STOP_IDS.mountain2End, '#517D91');
+    setGradientStop(THEME_STOP_IDS.mountain3Start, '#86D2A0');
+    setGradientStop(THEME_STOP_IDS.mountain3End, '#517D91');
+    setGradientStop(THEME_STOP_IDS.mountain4Start, '#86D2A0');
+    setGradientStop(THEME_STOP_IDS.mountain4End, '#517D91');
+  } else {
+    setGradientStop(THEME_STOP_IDS.bgStart, '#6A86EB');
+    setGradientStop(THEME_STOP_IDS.bgEnd, '#010203');
+    setGradientStop(THEME_STOP_IDS.circleStart, '#A5C5EB');
+    setGradientStop(THEME_STOP_IDS.circleEnd, '#51EAFF');
+    setGradientStop(THEME_STOP_IDS.mountain1Start, '#6783CA');
+    setGradientStop(THEME_STOP_IDS.mountain1End, '#271B59');
+    setGradientStop(THEME_STOP_IDS.mountain2Start, '#6783CA');
+    setGradientStop(THEME_STOP_IDS.mountain2End, '#271B59');
+    setGradientStop(THEME_STOP_IDS.mountain3Start, '#6783CA');
+    setGradientStop(THEME_STOP_IDS.mountain3End, '#271B59');
+    setGradientStop(THEME_STOP_IDS.mountain4Start, '#6783CA');
+    setGradientStop(THEME_STOP_IDS.mountain4End, '#271B59');
+  }
+}
+
+function initializeThemeToggle() {
+  const savedTheme = window.localStorage.getItem(THEME_STORAGE_KEY);
+  applyTheme(savedTheme === 'day' ? 'day' : 'night');
+
+  if (!themeToggle) {
+    return;
+  }
+
+  themeToggle.addEventListener('change', () => {
+    const nextTheme = themeToggle.checked ? 'day' : 'night';
+    window.localStorage.setItem(THEME_STORAGE_KEY, nextTheme);
+    applyTheme(nextTheme);
+  });
+}
 
 function escapeHtml(value) {
   return String(value)
@@ -483,11 +592,16 @@ function updateFilterSummary() {
   const activeFilters = getActiveFilters();
 
   if (activeFilters.includes(FILTER_ALL)) {
-    filterDropdownSummary.textContent = FILTER_LABELS.all;
+    filterDropdownSummary.textContent = 'Filters All Skins';
     return;
   }
 
-  filterDropdownSummary.textContent = activeFilters.map((value) => FILTER_LABELS[value]).join(', ');
+  const summaryText = `Filters ${activeFilters
+    .map((value) => FILTER_LABELS[value])
+    .join(', ')}`;
+
+  filterDropdownSummary.textContent =
+    summaryText.length > 22 ? `${summaryText.slice(0, 19).trimEnd()}...` : summaryText;
 }
 
 function syncFilterAvailability(data) {
@@ -973,4 +1087,5 @@ initializeStarField();
 initializeCardSpotlight();
 initializeFilterDropdown();
 initializeSkinModal();
+initializeThemeToggle();
 loadSkins();

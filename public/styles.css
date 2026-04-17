@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Neuton:wght@400;700&family=Oswald:wght@500;700&display=swap');
+
 :root {
   --bg: #0b0f14;
   --panel: rgba(255, 255, 255, 0.06);
@@ -7,9 +9,74 @@
   --muted: #aab9c6;
   --brand: #7c3aed;
   --brand2: #06b6d4;
+  --button-text: #ffffff;
   --accent: linear-gradient(135deg, var(--brand), var(--brand2));
   --radius: 18px;
   --toolbar-control-height: 46px;
+  --page-glow-1: rgba(124, 58, 237, 0.25);
+  --page-glow-2: rgba(6, 182, 212, 0.22);
+  --button-bg-1: rgba(14, 18, 26, 0.98);
+  --button-bg-2: rgba(22, 28, 40, 0.96);
+  --button-hover-1: rgba(18, 24, 35, 0.98);
+  --button-hover-2: rgba(30, 22, 50, 0.96);
+  --secondary-button-bg-1: rgba(13, 18, 27, 0.92);
+  --secondary-button-bg-2: rgba(10, 14, 21, 0.9);
+  --secondary-button-hover-1: rgba(18, 24, 36, 0.96);
+  --secondary-button-hover-2: rgba(14, 19, 29, 0.94);
+  --group-bg-1: rgba(15, 19, 27, 0.78);
+  --group-bg-2: rgba(9, 12, 18, 0.62);
+  --group-bg-base: rgba(8, 11, 16, 0.48);
+  --group-header-bg-1: rgba(22, 27, 38, 0.72);
+  --group-header-bg-2: rgba(13, 17, 24, 0.48);
+  --card-surface-1: rgba(12, 16, 23, 0.98);
+  --card-surface-2: rgba(8, 11, 16, 0.97);
+  --modal-backdrop: rgba(4, 7, 12, 0.72);
+  --modal-bg-1: rgba(14, 19, 27, 0.98);
+  --modal-bg-2: rgba(9, 12, 18, 0.96);
+  --section-bg-1: rgba(18, 24, 35, 0.82);
+  --section-bg-2: rgba(12, 16, 23, 0.78);
+  --value-bg-1: rgba(14, 18, 27, 0.8);
+  --value-bg-2: rgba(9, 12, 19, 0.7);
+  --surface-soft: rgba(255, 255, 255, 0.03);
+  --surface-dim: rgba(4, 7, 12, 0.45);
+}
+
+body[data-theme='day'] {
+  --bg: #eaf4ff;
+  --panel: rgba(255, 255, 255, 0.72);
+  --panel-2: rgba(255, 255, 255, 0.88);
+  --border: rgba(72, 101, 150, 0.18);
+  --text: #14253f;
+  --muted: #59708f;
+  --brand: #4f74df;
+  --brand2: #3fb9bf;
+  --button-text: #14253f;
+  --page-glow-1: rgba(106, 169, 255, 0.34);
+  --page-glow-2: rgba(122, 215, 191, 0.3);
+  --button-bg-1: rgba(255, 255, 255, 0.88);
+  --button-bg-2: rgba(228, 239, 255, 0.94);
+  --button-hover-1: rgba(245, 250, 255, 0.98);
+  --button-hover-2: rgba(219, 234, 255, 0.98);
+  --secondary-button-bg-1: rgba(255, 255, 255, 0.84);
+  --secondary-button-bg-2: rgba(233, 242, 255, 0.9);
+  --secondary-button-hover-1: rgba(249, 251, 255, 1);
+  --secondary-button-hover-2: rgba(225, 237, 255, 0.98);
+  --group-bg-1: rgba(255, 255, 255, 0.72);
+  --group-bg-2: rgba(233, 242, 255, 0.68);
+  --group-bg-base: rgba(210, 227, 248, 0.4);
+  --group-header-bg-1: rgba(247, 251, 255, 0.86);
+  --group-header-bg-2: rgba(226, 237, 252, 0.65);
+  --card-surface-1: rgba(255, 255, 255, 0.94);
+  --card-surface-2: rgba(237, 245, 255, 0.94);
+  --modal-backdrop: rgba(147, 176, 214, 0.42);
+  --modal-bg-1: rgba(253, 254, 255, 0.97);
+  --modal-bg-2: rgba(232, 243, 255, 0.95);
+  --section-bg-1: rgba(255, 255, 255, 0.84);
+  --section-bg-2: rgba(235, 244, 255, 0.84);
+  --value-bg-1: rgba(255, 255, 255, 0.8);
+  --value-bg-2: rgba(230, 241, 255, 0.74);
+  --surface-soft: rgba(255, 255, 255, 0.54);
+  --surface-dim: rgba(220, 235, 255, 0.54);
 }
 
 * {
@@ -21,8 +88,8 @@ body {
   margin: 0;
   padding: 0;
   background:
-    radial-gradient(1200px 800px at 80% 10%, rgba(124, 58, 237, 0.25), transparent 60%),
-    radial-gradient(1000px 700px at 10% 90%, rgba(6, 182, 212, 0.22), transparent 55%),
+    radial-gradient(1200px 800px at 80% 10%, var(--page-glow-1), transparent 60%),
+    radial-gradient(1000px 700px at 10% 90%, var(--page-glow-2), transparent 55%),
     var(--bg);
   color: var(--text);
   font-family: ui-sans-serif, system-ui, -apple-system, sans-serif;
@@ -90,19 +157,80 @@ a {
   z-index: 1;
 }
 
-h1 {
-  margin: 0 0 8px;
-  font-size: clamp(2.5rem, 6vw, 3.4rem);
-  background: linear-gradient(135deg, #fff 30%, var(--brand2) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-}
-
 p {
   color: var(--muted);
   max-width: 62ch;
   line-height: 1.6;
+}
+
+.hero {
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.hero-banner {
+  border: 4px double rgba(255, 255, 255, 0.18);
+  border-width: 4px 0;
+  color: rgba(255, 255, 255, 0.28);
+  display: inline-block;
+  font-family: 'Neuton', serif;
+  letter-spacing: 0.45em;
+  margin: 0;
+  max-width: none;
+  padding: 1.1em 0;
+  text-transform: uppercase;
+  width: min(100%, 40rem);
+}
+
+body[data-theme='day'] .hero-banner {
+  border-color: rgba(79, 116, 223, 0.2);
+  color: rgba(20, 37, 63, 0.34);
+}
+
+.hero-kicker {
+  display: block;
+  font-size: 0.9rem;
+}
+
+.hero-title {
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.98) 10%,
+    rgba(127, 224, 255, 0.94) 52%,
+    rgba(141, 195, 255, 0.86) 100%
+  );
+  background-clip: text;
+  display: block;
+  font-family: 'Oswald', sans-serif;
+  font-size: clamp(2.5rem, 7vw, 4.25rem);
+  letter-spacing: 0.04em;
+  line-height: 1;
+  margin: 0.18em auto 0;
+  padding: 0.2em 0 0.28em;
+  text-shadow: 0 0 42px rgba(255, 255, 255, 0.2);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-transform: translate3d(0, 0, 0);
+  -webkit-backface-visibility: hidden;
+}
+
+body[data-theme='day'] .hero-title {
+  background-image: linear-gradient(
+    135deg,
+    rgba(20, 37, 63, 0.98) 10%,
+    rgba(79, 116, 223, 0.9) 54%,
+    rgba(63, 185, 191, 0.84) 100%
+  );
+  text-shadow: 0 0 26px rgba(79, 116, 223, 0.12);
+}
+
+.hero-subtitle {
+  color: var(--muted);
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+  margin: 14px auto 0;
+  max-width: 56ch;
+  text-align: center;
 }
 
 .toolbar {
@@ -111,6 +239,12 @@ p {
   align-items: center;
   flex-wrap: wrap;
   margin: 28px 0 24px;
+}
+
+.theme-switch-wrap {
+  align-items: center;
+  display: flex;
+  gap: 0;
 }
 
 button,
@@ -135,7 +269,7 @@ input {
 button {
   cursor: pointer;
   font-weight: 700;
-  color: white;
+  color: var(--button-text);
 }
 
 button:hover {
@@ -143,7 +277,7 @@ button:hover {
 }
 
 .btn-6 {
-  background: linear-gradient(135deg, rgba(14, 18, 26, 0.98), rgba(22, 28, 40, 0.96));
+  background: linear-gradient(135deg, var(--button-bg-1), var(--button-bg-2));
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   box-shadow:
@@ -191,7 +325,7 @@ button:hover {
 }
 
 .btn-6:hover {
-  background: linear-gradient(135deg, rgba(18, 24, 35, 0.98), rgba(30, 22, 50, 0.96));
+  background: linear-gradient(135deg, var(--button-hover-1), var(--button-hover-2));
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.08),
     0 16px 34px rgba(0, 0, 0, 0.38);
@@ -235,7 +369,7 @@ button:hover {
 
 .toolbar-button {
   align-items: center;
-  background: linear-gradient(135deg, rgba(13, 18, 27, 0.92), rgba(10, 14, 21, 0.9));
+  background: linear-gradient(135deg, var(--secondary-button-bg-1), var(--secondary-button-bg-2));
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 14px;
   box-shadow:
@@ -252,7 +386,7 @@ button:hover {
 }
 
 .toolbar-button:hover {
-  background: linear-gradient(135deg, rgba(18, 24, 36, 0.96), rgba(14, 19, 29, 0.94));
+  background: linear-gradient(135deg, var(--secondary-button-hover-1), var(--secondary-button-hover-2));
 }
 
 .toolbar-button:disabled,
@@ -273,8 +407,8 @@ button:hover {
 .group {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
-    linear-gradient(180deg, rgba(15, 19, 27, 0.78), rgba(9, 12, 18, 0.62)),
-    rgba(8, 11, 16, 0.48);
+    linear-gradient(180deg, var(--group-bg-1), var(--group-bg-2)),
+    var(--group-bg-base);
   border-radius: var(--radius);
   overflow: hidden;
   margin-bottom: 18px;
@@ -316,7 +450,7 @@ button:hover {
   justify-content: space-between;
   align-items: center;
   padding: 16px 18px;
-  background: linear-gradient(180deg, rgba(22, 27, 38, 0.72), rgba(13, 17, 24, 0.48));
+  background: linear-gradient(180deg, var(--group-header-bg-1), var(--group-header-bg-2));
   border-bottom: 1px solid rgba(255, 255, 255, 0.06);
   position: relative;
   z-index: 1;
@@ -427,7 +561,7 @@ button:hover {
 }
 
 .card > .card-content {
-  background: linear-gradient(180deg, rgba(12, 16, 23, 0.98), rgba(8, 11, 16, 0.97));
+  background: linear-gradient(180deg, var(--card-surface-1), var(--card-surface-2));
   border-radius: inherit;
   display: flex;
   flex-direction: column;
@@ -564,14 +698,14 @@ button:hover {
 
 .skin-modal-backdrop {
   backdrop-filter: blur(14px);
-  background: rgba(4, 7, 12, 0.72);
+  background: var(--modal-backdrop);
   inset: 0;
   position: absolute;
 }
 
 .skin-modal-dialog {
   background:
-    linear-gradient(180deg, rgba(14, 19, 27, 0.98), rgba(9, 12, 18, 0.96)),
+    linear-gradient(180deg, var(--modal-bg-1), var(--modal-bg-2)),
     rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 24px;
@@ -657,7 +791,7 @@ button:hover {
   align-items: center;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 42%),
-    rgba(4, 7, 12, 0.45);
+    var(--surface-dim);
   border-radius: 18px;
   display: flex;
   justify-content: center;
@@ -761,7 +895,7 @@ button:hover {
 
 .skin-detail-section {
   background:
-    linear-gradient(180deg, rgba(18, 24, 35, 0.82), rgba(12, 16, 23, 0.78)),
+    linear-gradient(180deg, var(--section-bg-1), var(--section-bg-2)),
     rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 18px;
@@ -785,7 +919,7 @@ button:hover {
 }
 
 .skin-detail-meta-item {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-soft);
   border: 1px solid rgba(255, 255, 255, 0.04);
   border-radius: 14px;
   display: flex;
@@ -825,7 +959,7 @@ button:hover {
 }
 
 .skin-detail-code-list code {
-  background: rgba(255, 255, 255, 0.04);
+  background: var(--surface-soft);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 12px;
   color: rgba(232, 237, 242, 0.88);
@@ -841,7 +975,7 @@ button:hover {
 }
 
 .skin-detail-visual-card {
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-soft);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 16px;
   display: flex;
@@ -878,7 +1012,7 @@ button:hover {
 
 .skin-detail-visual-preview {
   align-items: center;
-  background: rgba(4, 7, 12, 0.42);
+  background: var(--surface-dim);
   border-radius: 14px;
   display: flex;
   height: 94px;
@@ -900,7 +1034,7 @@ button:hover {
 
 .skin-detail-level-item {
   align-items: center;
-  background: rgba(255, 255, 255, 0.03);
+  background: var(--surface-soft);
   border: 1px solid rgba(255, 255, 255, 0.05);
   border-radius: 14px;
   display: flex;
@@ -929,7 +1063,7 @@ button:hover {
 .value-summary {
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
-    linear-gradient(180deg, rgba(14, 18, 27, 0.8), rgba(9, 12, 19, 0.7)),
+    linear-gradient(180deg, var(--value-bg-1), var(--value-bg-2)),
     rgba(255, 255, 255, 0.03);
   border-radius: 22px;
   box-shadow:
@@ -983,7 +1117,7 @@ button:hover {
 
 .value-card {
   background:
-    linear-gradient(180deg, rgba(20, 26, 37, 0.82), rgba(13, 17, 24, 0.75)),
+    linear-gradient(180deg, var(--section-bg-1), var(--section-bg-2)),
     rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 16px;
@@ -1030,7 +1164,7 @@ button:hover {
 .filter-dropdown-button {
   align-items: center;
   background:
-    linear-gradient(135deg, rgba(14, 18, 26, 0.94), rgba(19, 24, 36, 0.9)),
+    linear-gradient(135deg, var(--button-bg-1), var(--button-bg-2)),
     rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
@@ -1039,12 +1173,13 @@ button:hover {
     0 12px 28px rgba(0, 0, 0, 0.22);
   cursor: pointer;
   display: flex;
-  gap: 10px;
+  gap: 8px;
   justify-content: space-between;
   height: var(--toolbar-control-height);
-  min-width: 240px;
+  min-width: 228px;
+  max-width: 228px;
   padding: 0 14px;
-  width: 100%;
+  width: 228px;
   transition:
     border-color 200ms ease,
     background 200ms ease,
@@ -1055,14 +1190,6 @@ button:hover {
 .filter-dropdown-button:hover {
   border-color: rgba(255, 255, 255, 0.14);
   transform: translateY(-1px);
-}
-
-.filter-dropdown-label {
-  color: var(--muted);
-  flex: 0 0 auto;
-  font-size: 0.82rem;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
 }
 
 .filter-dropdown-summary {
@@ -1088,7 +1215,7 @@ button:hover {
 
 .filter-dropdown-menu {
   background:
-    linear-gradient(180deg, rgba(15, 19, 27, 0.98), rgba(10, 13, 19, 0.96)),
+    linear-gradient(180deg, var(--modal-bg-1), var(--modal-bg-2)),
     rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
@@ -1184,7 +1311,7 @@ button:hover {
 }
 
 .filter-option:has(.filter-toggle-input:checked) {
-  background: linear-gradient(135deg, rgba(24, 32, 45, 0.95), rgba(20, 27, 39, 0.92));
+  background: linear-gradient(135deg, var(--group-header-bg-1), var(--group-header-bg-2));
   border-color: rgba(124, 58, 237, 0.18);
 }
 
@@ -1204,6 +1331,132 @@ button:hover {
   background: transparent;
 }
 
+.theme-switch {
+  border-radius: 100px;
+  box-shadow: 5px 5px 18px 0 rgba(0, 0, 0, 0.22);
+  display: inline-flex;
+  height: 58px;
+  margin-right: -48px;
+  overflow: hidden;
+  position: relative;
+  transform: scale(0.58);
+  transform-origin: left center;
+  width: 132px;
+}
+
+.theme-switch input {
+  flex: none;
+  height: 0;
+  min-width: 0;
+  opacity: 0;
+  position: absolute;
+  width: 0;
+}
+
+.theme-switch .slider {
+  background-image: linear-gradient(to bottom, #364bba, #a979d9);
+  cursor: pointer;
+  inset: 0;
+  position: absolute;
+  transition: 0.4s;
+}
+
+.theme-switch .slider::before {
+  background-color: #fff;
+  border-radius: 50%;
+  content: '';
+  height: 42px;
+  left: 8px;
+  position: absolute;
+  top: 8px;
+  transition: 0.4s;
+  width: 42px;
+  z-index: 9;
+}
+
+.theme-switch .slider-bg {
+  height: auto;
+  left: -3px;
+  position: absolute;
+  top: 25px;
+  width: 145px;
+  z-index: 6;
+}
+
+.theme-switch .slider-circle {
+  height: auto;
+  left: 77px;
+  position: absolute;
+  top: 14px;
+  transition: 0.4s;
+  width: 28px;
+  z-index: 5;
+}
+
+.theme-switch .circle {
+  background-color: #fffeda;
+  border-radius: 50%;
+  position: absolute;
+  transition: 0.4s;
+}
+
+.theme-switch .circle-1 { left: 10px; top: 13px; }
+.theme-switch .circle-2 { left: 20px; top: 6px; }
+.theme-switch .circle-3 { left: 42px; top: 8px; }
+.theme-switch .circle-4 { left: 61px; top: 5px; }
+.theme-switch .circle-5 { left: 61px; top: 24px; }
+.theme-switch .circle-6 { left: 65px; top: 14px; }
+.theme-switch .circle-7 { right: 55px; top: 8px; }
+.theme-switch .circle-8 { right: 39px; top: 7px; }
+.theme-switch .circle-9 { right: 26px; top: 6px; }
+.theme-switch .circle-10 { right: 23px; top: 14px; }
+.theme-switch .circle-11 { right: 12px; top: 15px; }
+
+.theme-switch .size-1 { height: 1px; width: 1px; }
+.theme-switch .size-2 { height: 2px; width: 2px; }
+.theme-switch .size-3 { height: 3px; width: 3px; }
+.theme-switch .size-4 { height: 4px; width: 4px; }
+
+.theme-switch .cloud {
+  position: absolute;
+  transform: translateY(200px);
+  transition: 0.4s;
+}
+
+.theme-switch .cloud-1 { left: 12px; top: 9px; width: 16px; }
+.theme-switch .cloud-2 { right: 46px; top: 16px; width: 28px; }
+.theme-switch .cloud-3 { right: 45px; top: 4px; width: 16px; }
+
+.theme-switch .mountain {
+  position: absolute;
+  z-index: 7;
+}
+
+.theme-switch .mountain-1 { left: -17px; top: 21px; width: 68px; }
+.theme-switch .mountain-2 { left: 14px; top: 24px; width: 55px; }
+.theme-switch .mountain-3 { right: 13px; top: 23px; width: 55px; }
+.theme-switch .mountain-4 { left: 82px; top: 23px; width: 68px; }
+
+.theme-switch input:checked + .slider {
+  background-image: linear-gradient(to bottom, #abfaff, #d5ffab);
+}
+
+.theme-switch input:checked + .slider::before {
+  transform: translateX(74px);
+}
+
+.theme-switch input:checked + .slider + .slider-bg + .slider-circle {
+  transform: translateX(-54px) translateY(-2px);
+}
+
+.theme-switch input:checked ~ .circle {
+  transform: translateY(-200px);
+}
+
+.theme-switch input:checked ~ .cloud {
+  transform: translateY(0);
+}
+
 @media (max-width: 720px) {
   .wrap {
     padding-top: 56px;
@@ -1213,11 +1466,22 @@ button:hover {
     align-items: stretch;
   }
 
+  .theme-switch-wrap {
+    justify-content: flex-start;
+    width: auto;
+  }
+
+  .theme-switch {
+    margin-right: -48px;
+    transform-origin: left center;
+  }
+
   .filter-dropdown {
     width: 100%;
   }
 
   .filter-dropdown-button {
+    max-width: none;
     min-width: 0;
     width: 100%;
   }
